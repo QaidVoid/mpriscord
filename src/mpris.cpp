@@ -10,7 +10,6 @@ std::string GetMediaPlayer(std::string &str)
 {
     str.erase(0, 23);
     std::string player = str.substr(0, str.find("."));
-    player[0] = toupper(player[0]);
     return player;
 }
 
@@ -54,7 +53,7 @@ std::string Mpris::GetCurrentMediaPlayer()
             }
         }
     }
-    return "No Media Playing!";
+    return "UNDEFINED";
 }
 
 // Return metadata from current media
@@ -62,10 +61,10 @@ Metadata *Mpris::GetMetadata()
 {
     Metadata *metadata = new Metadata;
     auto player = GetCurrentMediaPlayer();
-    metadata->player = GetMediaPlayer(player);
 
-    if (&proxy != nullptr)
+    if (&proxy != nullptr && player != "UNDEFINED")
     {
+        metadata->player = GetMediaPlayer(player);
         auto reply = proxy.GetProperty("org.mpris.MediaPlayer2.Player", "Metadata");
         char *res;
         std::vector<std::string> artists;

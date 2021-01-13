@@ -5,7 +5,7 @@ CXX = g++
 CXXFLAGS	:= -std=c++11 -Wall -Wextra -g `pkg-config --libs --cflags dbus-1`
 
 # define library paths in addition to /usr/lib
-LFLAGS = 
+LFLAGS = lib/libdiscord.so
 
 # define output directory
 OUTPUT	:= build

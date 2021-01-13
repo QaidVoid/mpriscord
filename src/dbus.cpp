@@ -28,15 +28,46 @@ Proxy Connection::WithProxy(std::string bus_name, std::string path)
     return *proxy;
 }
 
-// Return reply from DBUS message call
-DBusMessage *Proxy::method_call(std::string interface, std::string method)
+// Return reply from DBUS method call
+DBusMessage *Proxy::MethodCall(std::string interface, std::string method)
 {
     DBusError error;
     DBusMessage *msg, *reply;
-    char *res;
 
     dbus_error_init(&error);
     msg = dbus_message_new_method_call(bus_name.c_str(), path.c_str(), interface.c_str(), method.c_str());
+    if (msg == NULL)
+    {
+        exit(1);
+    }
+    reply = dbus_connection_send_with_reply_and_block(
+        connection->connection,
+        msg,
+        1000,
+        &error);
+    abort_on_error(&error);
+    dbus_message_unref(msg);
+    return reply;
+}
+
+// Return reply with property
+DBusMessage *Proxy::GetProperty(std::string interface, std::string property)
+{
+    DBusError error;
+    DBusMessage *msg, *reply;
+
+    dbus_error_init(&error);
+    msg = dbus_message_new_method_call(bus_name.c_str(), path.c_str(), "org.freedesktop.DBus.Properties", "Get");
+    if (msg == NULL)
+    {
+        exit(1);
+    }
+    dbus_message_append_args(
+        msg,
+        DBUS_TYPE_STRING, &interface,
+        DBUS_TYPE_STRING, &property,
+        DBUS_TYPE_INVALID);
+
     reply = dbus_connection_send_with_reply_and_block(
         connection->connection,
         msg,
@@ -50,23 +81,14 @@ DBusMessage *Proxy::method_call(std::string interface, std::string method)
 // Return all available Bus Names.
 std::vector<std::string> Connection::GetAllBus()
 {
-    DBusError error;
-    DBusMessage *msg, *reply;
+    Proxy proxy = WithProxy("org.freedesktop.DBus", "/");
+    DBusMessage *reply = proxy.MethodCall("org.freedesktop.DBus", "ListNames");
+
     DBusMessageIter iter, sub;
     std::vector<std::string> result;
     char *res;
 
-    dbus_error_init(&error);
-    msg = dbus_message_new_method_call("org.freedesktop.DBus", "/", "org.freedesktop.DBus", "ListNames");
-    reply = dbus_connection_send_with_reply_and_block(
-        connection,
-        msg,
-        1000,
-        &error);
-    abort_on_error(&error);
-    dbus_message_unref(msg);
     dbus_message_iter_init(reply, &iter);
-
     do
     {
         dbus_message_iter_recurse(&iter, &sub);

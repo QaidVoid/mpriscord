@@ -7,7 +7,8 @@ class Connection;
 class Proxy
 {
 public:
-    DBusMessage *method_call(std::string interface, std::string method);
+    DBusMessage *MethodCall(std::string interface, std::string method);
+    DBusMessage *GetProperty(std::string interface, std::string property);
     Connection *connection;
     std::string bus_name;
     std::string path;

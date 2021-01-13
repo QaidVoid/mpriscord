@@ -1,8 +1,8 @@
 # define the Cpp compiler to use
-CXX = g++
+CXX = clang++
 
 # define any compile-time flags
-CXXFLAGS	:= -std=c++17 -Wall -Wextra -g `pkg-config --libs --cflags dbus-1`
+CXXFLAGS	:= -std=c++11 -Wall -Wextra -g `pkg-config --libs --cflags dbus-1`
 
 # define library paths in addition to /usr/lib
 LFLAGS = 

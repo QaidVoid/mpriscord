@@ -1,3 +1,4 @@
+#pragma once
 #include <dbus/dbus.h>
 #include <iostream>
 #include <vector>

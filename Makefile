@@ -1,5 +1,5 @@
 # define the Cpp compiler to use
-CXX = clang++
+CXX = g++
 
 # define any compile-time flags
 CXXFLAGS	:= -std=c++11 -Wall -Wextra -g `pkg-config --libs --cflags dbus-1`

@@ -77,7 +77,12 @@ void DiscordState::SetActivity()
         std::string artist = metadata->artist;
 
         discord::Activity activity{};
-        discord::Timestamp ts = time(NULL) - position;
+
+        auto now = std::chrono::system_clock::now();
+        auto duration = now.time_since_epoch();
+        auto micro = std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
+        discord::Timestamp ts = ((micro - position) / 1e3);
+
         activity.SetType(discord::ActivityType::Listening);
         activity.SetDetails(title.c_str());
         activity.SetState(artist.c_str());

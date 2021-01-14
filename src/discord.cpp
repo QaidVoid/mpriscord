@@ -40,9 +40,13 @@ void DiscordState::SetMetadata()
             if (dbus_message_iter_init(msg, &args) && DBUS_TYPE_STRING == dbus_message_iter_get_arg_type(&args))
             {
                 dbus_message_iter_get_basic(&args, &value);
-                metadata = mpris->GetMetadata();
-                position = mpris->GetPosition();
-                SetActivity();
+
+                if (value == "org.mpris.MediaPlayer2.Player")
+                {
+                    metadata = mpris->GetMetadata();
+                    position = mpris->GetPosition();
+                    SetActivity();
+                }
             }
         }
 

@@ -41,7 +41,7 @@ void DiscordState::SetMetadata()
             {
                 dbus_message_iter_get_basic(&args, &value);
 
-                if (value == "org.mpris.MediaPlayer2.Player")
+                if (std::string(value) == "org.mpris.MediaPlayer2.Player")
                 {
                     metadata = mpris->GetMetadata();
                     position = mpris->GetPosition();

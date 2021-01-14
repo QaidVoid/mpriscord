@@ -12,5 +12,6 @@ struct DiscordState
 
 private:
     Metadata *metadata;
+    int64_t position;
     void SetActivity();
 };

@@ -20,6 +20,7 @@ public:
     std::vector<std::string> GetAllMediaPlayer();
     std::string GetCurrentMediaPlayer();
     Metadata *GetMetadata();
+    int64_t GetPosition();
 
 private:
     Connection *connection;

@@ -73,7 +73,6 @@ DBusMessage *Proxy::GetProperty(std::string interface, std::string property)
         msg,
         1000,
         &error);
-    abort_on_error(&error);
     dbus_message_unref(msg);
     return reply;
 }

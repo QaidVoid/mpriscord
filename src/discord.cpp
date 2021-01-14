@@ -12,6 +12,7 @@ void DiscordState::SetMetadata()
     Connection *connect = new Connection;
     conn = connect->connection;
     metadata = mpris->GetMetadata();
+    position = mpris->GetPosition();
     SetActivity();
 
     // add a rule for which messages we want to see
@@ -40,6 +41,7 @@ void DiscordState::SetMetadata()
             {
                 dbus_message_iter_get_basic(&args, &value);
                 metadata = mpris->GetMetadata();
+                position = mpris->GetPosition();
                 SetActivity();
             }
         }
@@ -71,15 +73,17 @@ void DiscordState::SetActivity()
                 });
         }
         const char *player = metadata->player.c_str();
-        const char *title = metadata->title.c_str();
-        std::string artist = std::string("by ").append(metadata->artist);
-        std::string album = std::string("Album: ").append(metadata->album);
+        std::string title = metadata->title;
+        std::string artist = metadata->artist;
 
         discord::Activity activity{};
+        discord::Timestamp ts = time(NULL) - position;
         activity.SetType(discord::ActivityType::Listening);
-        activity.SetDetails(title);
+        activity.SetDetails(title.c_str());
         activity.SetState(artist.c_str());
         activity.GetAssets().SetLargeImage(player);
+        activity.GetAssets().SetLargeText(player);
+        activity.GetTimestamps().SetStart(ts);
         core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {});
         isActive = true;
     }

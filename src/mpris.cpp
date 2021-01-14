@@ -11,6 +11,11 @@ std::string GetMediaPlayer(std::string &str)
 {
     str.erase(0, 23);
     std::string player = str.substr(0, str.find("."));
+
+    if (player != "spotify" && player != "firefox" && player != "cmus")
+    {
+        return "default";
+    }
     return player;
 }
 
@@ -40,6 +45,7 @@ std::string Mpris::GetCurrentMediaPlayer()
         DBusMessageIter iter;
         if (dbus_message_iter_init(reply, &iter) && DBUS_TYPE_VARIANT == dbus_message_iter_get_arg_type(&iter))
         {
+            dbus_message_unref(reply);
             DBusMessageIter sub;
             dbus_message_iter_recurse(&iter, &sub);
 
@@ -68,11 +74,11 @@ Metadata *Mpris::GetMetadata()
         metadata->player = GetMediaPlayer(player);
         auto reply = proxy.GetProperty("org.mpris.MediaPlayer2.Player", "Metadata");
         char *res;
-        std::vector<std::string> artists;
 
         DBusMessageIter iter;
-        if (dbus_message_iter_init(reply, &iter) && DBUS_TYPE_VARIANT == dbus_message_iter_get_arg_type(&iter))
+        if (reply != nullptr && dbus_message_iter_init(reply, &iter) && DBUS_TYPE_VARIANT == dbus_message_iter_get_arg_type(&iter))
         {
+            dbus_message_unref(reply);
             DBusMessageIter sub;
             dbus_message_iter_recurse(&iter, &sub);
 
@@ -144,6 +150,26 @@ Metadata *Mpris::GetMetadata()
         return metadata;
     }
     return nullptr;
+}
+
+int64_t Mpris::GetPosition()
+{
+    DBusMessageIter iter;
+    auto reply = proxy.GetProperty("org.mpris.MediaPlayer2.Player", "Position");
+    int64_t pos = 0;
+
+    if (reply != nullptr && dbus_message_iter_init(reply, &iter) && DBUS_TYPE_VARIANT == dbus_message_iter_get_arg_type(&iter))
+    {
+        dbus_message_unref(reply);
+        DBusMessageIter sub;
+        dbus_message_iter_recurse(&iter, &sub);
+
+        if (DBUS_TYPE_INT64 == dbus_message_iter_get_arg_type(&sub))
+        {
+            dbus_message_iter_get_basic(&sub, &pos);
+        }
+    }
+    return pos;
 }
 
 std::ostream &operator<<(std::ostream &out, const Metadata &m)

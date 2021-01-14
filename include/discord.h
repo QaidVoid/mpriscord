@@ -2,8 +2,6 @@
 #include <sdk/discord.h>
 #include <mpris.h>
 #include <thread>
-#include <iostream>
-#include <csignal>
 
 const long int CLIENT = 797378815995150336;
 struct DiscordState

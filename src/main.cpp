@@ -1,4 +1,5 @@
 #include <discord.h>
+#include <csignal>
 
 namespace
 {

@@ -1,5 +1,4 @@
 #include <discord.h>
-#include <unistd.h>
 
 void DiscordState::SetMetadata()
 {
@@ -29,7 +28,7 @@ void DiscordState::SetMetadata()
         // loop again if we haven't read a message
         if (NULL == msg)
         {
-            sleep(1);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             continue;
         }
 

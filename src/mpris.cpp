@@ -12,7 +12,7 @@ std::string GetMediaPlayer(std::string &str)
     str.erase(0, 23);
     std::string player = str.substr(0, str.find("."));
 
-    if (player != "spotify" && player != "firefox" && player != "cmus")
+    if (player != "firefox" && player != "cmus")
     {
         return "default";
     }
@@ -38,6 +38,8 @@ std::string Mpris::GetCurrentMediaPlayer()
 
     for (auto &player : players)
     {
+        if (player == "org.mpris.MediaPlayer2.spotify")
+            continue;
         proxy = connection->WithProxy(player, "/org/mpris/MediaPlayer2");
         auto reply = proxy.GetProperty("org.mpris.MediaPlayer2.Player", "PlaybackStatus");
         char *res;
@@ -135,11 +137,6 @@ Metadata *Mpris::GetMetadata()
                                     {
                                         dbus_message_iter_get_basic(&dictValue, &metadata->length);
                                     }
-                                    else if (key == "mpris:artUrl")
-                                    {
-                                        dbus_message_iter_get_basic(&dictValue, &res);
-                                        metadata->artUrl = res;
-                                    }
                                 }
                             }
                         } while (dbus_message_iter_next(&dictEntryIter));
@@ -178,7 +175,6 @@ std::ostream &operator<<(std::ostream &out, const Metadata &m)
         << "Title: " << m.title << "\n"
         << "Album: " << m.album << "\n"
         << "Artist: " << m.artist << "\n"
-        << "ArtUrl: " << m.artUrl << "\n"
         << "Length: " << m.length;
     return out;
 }

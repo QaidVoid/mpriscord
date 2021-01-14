@@ -8,7 +8,6 @@ struct Metadata
     std::string title;
     std::string album;
     std::string artist;
-    std::string artUrl;
     int64_t length;
     friend std::ostream &operator<<(std::ostream &out, const Metadata &m);
 };

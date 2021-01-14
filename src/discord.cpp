@@ -12,7 +12,8 @@ void DiscordState::SetMetadata()
     Connection *connect = new Connection;
     conn = connect->connection;
     metadata = mpris->GetMetadata();
-    position = mpris->GetPosition();
+    if (metadata != nullptr)
+        position = mpris->GetPosition();
     SetActivity();
 
     // add a rule for which messages we want to see
@@ -37,14 +38,50 @@ void DiscordState::SetMetadata()
         if (dbus_message_is_signal(msg, "org.freedesktop.DBus.Properties", "PropertiesChanged"))
         {
             // read the parameters
-            if (dbus_message_iter_init(msg, &args) && DBUS_TYPE_STRING == dbus_message_iter_get_arg_type(&args))
+            dbus_message_iter_init(msg, &args);
+
+            if (DBUS_TYPE_STRING == dbus_message_iter_get_arg_type(&args))
             {
                 dbus_message_iter_get_basic(&args, &value);
-
-                if (std::string(value) == "org.mpris.MediaPlayer2.Player")
+                if (std::string(value) == "org.mpris.MediaPlayer2.Player" && dbus_message_iter_next(&args))
                 {
-                    metadata = mpris->GetMetadata();
-                    position = mpris->GetPosition();
+                    if (DBUS_TYPE_ARRAY == dbus_message_iter_get_arg_type(&args))
+                    {
+                        DBusMessageIter arrayIter;
+                        dbus_message_iter_recurse(&args, &arrayIter);
+                        do
+                        {
+                            if (DBUS_TYPE_DICT_ENTRY == dbus_message_iter_get_arg_type(&arrayIter))
+                            {
+                                DBusMessageIter dictEntryIter;
+                                dbus_message_iter_recurse(&arrayIter, &dictEntryIter);
+
+                                if (DBUS_TYPE_STRING == dbus_message_iter_get_arg_type(&dictEntryIter))
+                                {
+                                    dbus_message_iter_get_basic(&dictEntryIter, &value);
+                                    if (std::string(value) == "Metadata")
+                                    {
+                                        metadata = mpris->GetMetadata();
+                                    }
+                                    else if (std::string(value) == "PlaybackStatus")
+                                    {
+                                        if (dbus_message_iter_next(&dictEntryIter))
+                                        {
+                                            DBusMessageIter entry;
+                                            dbus_message_iter_recurse(&dictEntryIter, &entry);
+                                            dbus_message_iter_get_basic(&entry, &value);
+                                            if (std::string(value) == "Playing")
+                                                metadata = mpris->GetMetadata();
+                                            else
+                                                metadata = nullptr;
+                                        }
+                                    }
+                                }
+                            }
+                        } while (dbus_message_iter_next(&arrayIter));
+                    }
+                    if (metadata != nullptr)
+                        position = mpris->GetPosition();
                     SetActivity();
                 }
             }

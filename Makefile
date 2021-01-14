@@ -2,7 +2,7 @@
 CXX = g++
 
 # define any compile-time flags
-CXXFLAGS	:= -std=c++11 -Wall -Wextra -g `pkg-config --libs --cflags dbus-1`
+CXXFLAGS	:= -std=c++11 -Wall -Wextra -g `pkg-config --libs --cflags dbus-1` -pthread
 
 # define library paths in addition to /usr/lib
 LFLAGS = lib/libdiscord.so

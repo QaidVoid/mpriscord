@@ -1,4 +1,5 @@
 #include <mpris.h>
+#include <unistd.h>
 
 Mpris::Mpris()
 {

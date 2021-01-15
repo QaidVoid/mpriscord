@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <map>
 
-// Identify Name of the player mapped to discord rich presence asset key
+// Identity Name of the player mapped to discord rich presence asset key
 const std::map<std::string, std::string> MEDIA_PLAYER = {
     {"Mozilla Firefox", "firefox"},
     {"cmus", "cmus"}
@@ -18,6 +18,7 @@ const std::string PLAYER_PRIORITY[] = {
 
 struct Metadata
 {
+    std::string identity;
     std::string player;
     std::string title;
     std::string album;
@@ -36,7 +37,7 @@ public:
     int64_t GetPosition();
 
 private:
-    std::string GetMediaPlayer();
+    std::string GetPlayerIdentity();
     Connection *connection;
     Proxy proxy;
 };

@@ -6,7 +6,7 @@ Mpris::Mpris()
     connection = conn;
 }
 
-std::string Mpris::GetMediaPlayer()
+std::string Mpris::GetPlayerIdentity()
 {
     auto reply = proxy.GetProperty("org.mpris.MediaPlayer2", "Identity");
     char *res;
@@ -21,13 +21,9 @@ std::string Mpris::GetMediaPlayer()
         if (DBUS_TYPE_STRING == dbus_message_iter_get_arg_type(&sub))
         {
             dbus_message_iter_get_basic(&sub, &res);
-            if (!MEDIA_PLAYER.count(res))
-            {
-                return "default";
-            }
-            return MEDIA_PLAYER.at(res);
         }
     }
+    return res;
 }
 
 // Return all available media player in current session
@@ -97,7 +93,7 @@ std::string Mpris::GetCurrentMediaPlayer()
         return false;
     });
     if (player != "UNDEFINED")
-        proxy = connection->WithProxy(player, "/org/mpris/MediaPlayer2");
+        proxy = connection->WithProxy(player, "/org/mpris/MediaPlayer2"); // Set proxy for high priority player
     return player;
 }
 
@@ -109,7 +105,17 @@ Metadata *Mpris::GetMetadata()
 
     if (&proxy != nullptr && player != "UNDEFINED")
     {
-        metadata->player = GetMediaPlayer();
+        metadata->identity = GetPlayerIdentity();
+
+        if (!MEDIA_PLAYER.count(metadata->identity))
+        {
+            metadata->player = metadata->identity;
+        }
+        else
+        {
+            metadata->player = MEDIA_PLAYER.at(metadata->identity);
+        }
+
         auto reply = proxy.GetProperty("org.mpris.MediaPlayer2.Player", "Metadata");
         char *res;
 
@@ -223,7 +229,7 @@ int64_t Mpris::GetPosition()
 
 std::ostream &operator<<(std::ostream &out, const Metadata &m)
 {
-    out << "Playing on " << m.player << "\n"
+    out << "Playing on " << m.identity << "\n"
         << "Title: " << m.title << "\n"
         << "Album: " << m.album << "\n"
         << "Artist: " << m.artist << "\n"

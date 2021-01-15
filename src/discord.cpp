@@ -140,7 +140,6 @@ void DiscordState::SetActivity()
                     std::cerr << "Log(" << static_cast<uint32_t>(level) << "): " << message << "\n";
                 });
         }
-        const char *player = metadata->player.c_str();
         std::string title = metadata->title;
         std::string artist = metadata->artist;
 
@@ -154,8 +153,8 @@ void DiscordState::SetActivity()
         activity.SetType(discord::ActivityType::Listening);
         activity.SetDetails(title.c_str());
         activity.SetState(artist.c_str());
-        activity.GetAssets().SetLargeImage(player);
-        activity.GetAssets().SetLargeText(player);
+        activity.GetAssets().SetLargeImage(metadata->player.c_str());
+        activity.GetAssets().SetLargeText(metadata->identity.c_str());
         activity.GetTimestamps().SetStart(ts);
         core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {});
         isActive = true;

@@ -3,9 +3,18 @@
 #include <algorithm>
 #include <map>
 
+// Identify Name of the player mapped to discord rich presence asset key
 const std::map<std::string, std::string> MEDIA_PLAYER = {
     {"Mozilla Firefox", "firefox"},
-    {"cmus", "cmus"}};
+    {"cmus", "cmus"}
+};
+
+// Media player priority
+const std::string PLAYER_PRIORITY[] = {
+    "cmus",
+    "plasma-browser-integration",
+    "firefox"
+};
 
 struct Metadata
 {

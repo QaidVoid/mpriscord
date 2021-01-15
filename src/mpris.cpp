@@ -21,7 +21,8 @@ std::string Mpris::GetMediaPlayer()
         if (DBUS_TYPE_STRING == dbus_message_iter_get_arg_type(&sub))
         {
             dbus_message_iter_get_basic(&sub, &res);
-            if (!MEDIA_PLAYER.count(res)) {
+            if (!MEDIA_PLAYER.count(res))
+            {
                 return "default";
             }
             return MEDIA_PLAYER.at(res);
@@ -45,6 +46,7 @@ std::vector<std::string> Mpris::GetAllMediaPlayer()
 std::string Mpris::GetCurrentMediaPlayer()
 {
     auto players = GetAllMediaPlayer();
+    std::vector<std::string> active;
 
     for (auto &player : players)
     {
@@ -67,12 +69,36 @@ std::string Mpris::GetCurrentMediaPlayer()
                 std::string r(res);
                 if (r == "Playing")
                 {
-                    return player;
+                    active.push_back(player);
                 }
             }
         }
     }
-    return "UNDEFINED";
+
+    int idx = -1;
+    std::string player = "UNDEFINED";
+    if (active.size() > 0)
+        player = active[0];
+
+    auto itr = std::find_if(std::begin(active), std::end(active), [&](const std::string &v) {
+        std::string fi = v;
+        fi.erase(0, 23);
+        std::string mp = fi.substr(0, fi.find("."));
+
+        auto it = std::find(PLAYER_PRIORITY, std::end(PLAYER_PRIORITY), mp);
+        if (it != std::end(PLAYER_PRIORITY))
+        {
+            if (idx == -1 || idx > std::distance(PLAYER_PRIORITY, it))
+            {
+                idx = std::distance(PLAYER_PRIORITY, it);
+                player = v;
+            }
+        }
+        return false;
+    });
+    if (player != "UNDEFINED")
+        proxy = connection->WithProxy(player, "/org/mpris/MediaPlayer2");
+    return player;
 }
 
 // Return metadata from current media
@@ -151,7 +177,10 @@ Metadata *Mpris::GetMetadata()
                                             do
                                             {
                                                 dbus_message_iter_get_basic(&dictInnerValue, &res);
-                                                artists.append(", ").append(res);
+                                                if (artists.empty())
+                                                    artists = res;
+                                                else
+                                                    artists.append(", ").append(res);
                                             } while (dbus_message_iter_next(&dictInnerValue));
                                         }
                                         metadata->artist = artists;

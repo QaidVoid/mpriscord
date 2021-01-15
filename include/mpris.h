@@ -19,7 +19,6 @@ const std::string PLAYER_PRIORITY[] = {
 struct Metadata
 {
     std::string identity;
-    std::string player;
     std::string title;
     std::string album;
     std::string artist;

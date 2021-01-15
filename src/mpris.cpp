@@ -107,15 +107,6 @@ Metadata *Mpris::GetMetadata()
     {
         metadata->identity = GetPlayerIdentity();
 
-        if (!MEDIA_PLAYER.count(metadata->identity))
-        {
-            metadata->player = metadata->identity;
-        }
-        else
-        {
-            metadata->player = MEDIA_PLAYER.at(metadata->identity);
-        }
-
         auto reply = proxy.GetProperty("org.mpris.MediaPlayer2.Player", "Metadata");
         char *res;
 

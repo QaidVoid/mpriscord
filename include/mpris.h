@@ -1,6 +1,11 @@
 #pragma once
 #include <dbus.h>
 #include <algorithm>
+#include <map>
+
+const std::map<std::string, std::string> MEDIA_PLAYER = {
+    {"Mozilla Firefox", "firefox"},
+    {"cmus", "cmus"}};
 
 struct Metadata
 {
@@ -22,6 +27,7 @@ public:
     int64_t GetPosition();
 
 private:
+    std::string GetMediaPlayer();
     Connection *connection;
     Proxy proxy;
 };

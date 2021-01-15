@@ -7,16 +7,27 @@ Mpris::Mpris()
     connection = conn;
 }
 
-std::string GetMediaPlayer(std::string &str)
+std::string Mpris::GetMediaPlayer()
 {
-    str.erase(0, 23);
-    std::string player = str.substr(0, str.find("."));
+    auto reply = proxy.GetProperty("org.mpris.MediaPlayer2", "Identity");
+    char *res;
 
-    if (player != "firefox" && player != "cmus")
+    DBusMessageIter iter;
+    if (dbus_message_iter_init(reply, &iter) && DBUS_TYPE_VARIANT == dbus_message_iter_get_arg_type(&iter))
     {
-        return "default";
+        dbus_message_unref(reply);
+        DBusMessageIter sub;
+        dbus_message_iter_recurse(&iter, &sub);
+
+        if (DBUS_TYPE_STRING == dbus_message_iter_get_arg_type(&sub))
+        {
+            dbus_message_iter_get_basic(&sub, &res);
+            if (!MEDIA_PLAYER.count(res)) {
+                return "default";
+            }
+            return MEDIA_PLAYER.at(res);
+        }
     }
-    return player;
 }
 
 // Return all available media player in current session
@@ -73,7 +84,7 @@ Metadata *Mpris::GetMetadata()
 
     if (&proxy != nullptr && player != "UNDEFINED")
     {
-        metadata->player = GetMediaPlayer(player);
+        metadata->player = GetMediaPlayer();
         auto reply = proxy.GetProperty("org.mpris.MediaPlayer2.Player", "Metadata");
         char *res;
 

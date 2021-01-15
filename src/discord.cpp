@@ -70,10 +70,10 @@ void DiscordState::SetMetadata()
                                             DBusMessageIter entry;
                                             dbus_message_iter_recurse(&dictEntryIter, &entry);
                                             dbus_message_iter_get_basic(&entry, &value);
-                                            if (std::string(value) == "Playing")
-                                                metadata = mpris->GetMetadata();
-                                            else
+                                            if (std::string(value) == "Stopped")
                                                 metadata = nullptr;
+                                            else
+                                                metadata = mpris->GetMetadata();
                                         }
                                     }
                                 }

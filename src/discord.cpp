@@ -107,6 +107,12 @@ void DiscordState::SetMetadata()
                 }
             }
         }
+        else if (dbus_message_is_signal(msg, "org.mpris.MediaPlayer2.Player", "Seeked"))
+        {
+            if (metadata != nullptr)
+                position = mpris->GetPosition();
+            SetActivity();
+        }
 
         // free the message
         dbus_message_unref(msg);

@@ -128,10 +128,23 @@ Metadata *Mpris::GetMetadata()
                                     }
                                     else if (key == "xesam:artist")
                                     {
-                                        DBusMessageIter dictInnerValue;
-                                        dbus_message_iter_recurse(&dictValue, &dictInnerValue);
-                                        dbus_message_iter_get_basic(&dictInnerValue, &res);
-                                        metadata->artist = res;
+                                        std::string artists;
+                                        if (DBUS_TYPE_STRING == dbus_message_iter_get_arg_type(&dictValue))
+                                        {
+                                            dbus_message_iter_get_basic(&dictValue, &res);
+                                            artists = res;
+                                        }
+                                        else if (DBUS_TYPE_ARRAY == dbus_message_iter_get_arg_type(&dictValue))
+                                        {
+                                            DBusMessageIter dictInnerValue;
+                                            dbus_message_iter_recurse(&dictValue, &dictInnerValue);
+                                            do
+                                            {
+                                                dbus_message_iter_get_basic(&dictInnerValue, &res);
+                                                artists.append(", ").append(res);
+                                            } while (dbus_message_iter_next(&dictInnerValue));
+                                        }
+                                        metadata->artist = artists;
                                     }
                                     else if (key == "mpris:length")
                                     {

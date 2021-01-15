@@ -17,7 +17,7 @@ void DiscordState::SetMetadata()
     SetActivity();
 
     // add a rule for which messages we want to see
-    dbus_bus_add_match(conn, "type='signal',interface='org.freedesktop.DBus.Properties'", &error); // see signals from the given interface
+    dbus_bus_add_match(conn, "type='signal'", &error); // see signals from the given interface
     dbus_connection_flush(conn);
 
     // loop listening for signals being emmitted
@@ -83,6 +83,27 @@ void DiscordState::SetMetadata()
                     if (metadata != nullptr)
                         position = mpris->GetPosition();
                     SetActivity();
+                }
+            }
+        }
+        else if (dbus_message_is_signal(msg, "org.freedesktop.DBus", "NameOwnerChanged"))
+        {
+            // read the parameters
+            dbus_message_iter_init(msg, &args);
+
+            if (DBUS_TYPE_STRING == dbus_message_iter_get_arg_type(&args))
+            {
+                dbus_message_iter_get_basic(&args, &value);
+
+                if (std::string(value) == "org.mpris.MediaPlayer2.cmus" && dbus_message_iter_next(&args))
+                {
+                    dbus_message_iter_get_basic(&args, &value);
+
+                    if (!std::string(value).empty())
+                    {
+                        metadata = nullptr;
+                        SetActivity();
+                    }
                 }
             }
         }

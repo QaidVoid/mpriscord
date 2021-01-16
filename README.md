@@ -10,7 +10,6 @@ Media player priority can be changed in `include/mpris.h`.
 
 Supported media players:
 - [CMUS](https://cmus.github.io)
-- [Plasma Browser Integration](https://community.kde.org/Plasma/Browser_Integration)
-- Firefox (is messy, use Plasma Browser Integration)
-
-Other media players should also work.
+- [Plasma Browser Integration](https://community.kde.org/Plasma/Browser_Integration) for Firefox
+- [VLC Media Player](https://www.videolan.org/vlc)
+Other media players implementing MPRIS interface should also work.

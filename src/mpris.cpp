@@ -76,7 +76,8 @@ std::string Mpris::GetCurrentMediaPlayer()
     if (active.size() > 0)
         player = active[0];
 
-    auto itr = std::find_if(std::begin(active), std::end(active), [&](const std::string &v) {
+    for (const auto &v : active)
+    {
         std::string fi = v;
         fi.erase(0, 23);
         std::string mp = fi.substr(0, fi.find("."));
@@ -90,8 +91,7 @@ std::string Mpris::GetCurrentMediaPlayer()
                 player = v;
             }
         }
-        return false;
-    });
+    };
     if (player != "UNDEFINED")
         proxy = connection->WithProxy(player, "/org/mpris/MediaPlayer2"); // Set proxy for high priority player
     return player;

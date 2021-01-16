@@ -6,13 +6,15 @@
 // Identity Name of the player mapped to discord rich presence asset key
 const std::map<std::string, std::string> MEDIA_PLAYER = {
     {"Mozilla Firefox", "firefox"},
-    {"cmus", "cmus"}
+    {"cmus", "cmus"},
+    {"VLC media player", "vlc"}
 };
 
 // Media player priority
 const std::string PLAYER_PRIORITY[] = {
     "cmus",
     "plasma-browser-integration",
+    "vlc",
     "firefox"
 };
 
